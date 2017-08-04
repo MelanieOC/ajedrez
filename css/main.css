@@ -2,9 +2,16 @@
   background-color: black;
   color:white;
 }
+table{
+  border-top: 1px solid;
+  border-left: 1px solid;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+  border-spacing: 0;
+}
 
 td{
-  width: 40px;
-  height: 40px;
+  width: 55px;
+  height: 55px;
   text-align: center;
 }

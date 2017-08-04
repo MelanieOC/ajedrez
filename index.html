@@ -3,19 +3,23 @@
   <head>
     <meta charset="utf-8">
     <title>Ajedrez</title>
+    <script src="js/main2.js"></script>
     <link rel="stylesheet" href="css/main.css">
   </head>
   <body>
-    <h1>Juego recorrido de caballo</h1>
-    <div class="">
-        <p>Numero de lados</p>
-        <p><input type='text' id="lados" size='4'/>  <button id='ejecutar'>Generar Tabla</button></p>
-        <p><button id="siguiente">Solucion</button>   <button id="paso">Paso a paso</button></p>
-    </div>
-    <div id="tablero">
-    </div>
-    <script src="js/main.js">
-
-    </script>
+    <center>
+      <h1>Juego recorrido de caballo</h1>
+      <div class="">
+          <p>Numero de lados</p>
+          <p><input type='text' id="lados" size='4'/>  <button id='ejecutar'>Generar Tabla</button></p>
+          <div id='botones'></div>
+          <p><button id="solucion">Solucion directa</button>
+             <button id="paso">Solucion Paso a paso</button></p>
+      </div>
+      <div id="pasos"></div>
+      <div id="tablero">
+      </div>
+    </center>
+    <script src="js/main.js"></script>
   </body>
 </html>

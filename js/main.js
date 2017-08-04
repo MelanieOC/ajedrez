@@ -1,122 +1,14 @@
 var generar = document.getElementById('ejecutar');
 var tablero = document.getElementById('tablero');
+var boton = document.getElementById('pasos');
 
-function check (i, j, n) {
-   if (  i >= 0 && j >= 0 && i < n && j < n)
-       return true;
-   return false;
-}
-function randInt (n) {
-   return Math.floor(Math.random () * n);
-}
-
-
-function gen_heuristic (n){
-  var M = initMatrix (n);
-  var p = 1;
-  while (p <= n / 2 + 1 ) {
-    for (var i = p-1; i <= n - p; i++){
-      M[p - 1][i] = p;
-      M[i][p - 1] = p;
-      M[i][n - p] = p;
-      M[n - p][i] = p;
-    }
-    p++;
-  }
-  M[0][0] = 0;
-  M[0][n - 1] = 0;
-  M[n - 1][0] = 0;
-  M[n - 1][n - 1] = 0;
-  return M;
-}
-
-
-function shuffleArray(d) {
-  for (var c = d.length - 1; c > 0; c--) {
-    var b = Math.floor(Math.random() * (c + 1));
-    var a = d[c];
-    d[c] = d[b];
-    d[b] = a;
-  }
-  return d
-};
-
-function use_helper (soluciones, helper) {
-   var pos = -1;
-   var min = 10000;
-   soluciones = shuffleArray (soluciones);
-   for (var i = 0; i < soluciones.length; i++) {
-      var x = soluciones[i].x;
-      var y = soluciones[i].y;
-      if ( helper[x][y] < min) {
-         min = helper[x][y] ;
-         pos = i;
-      }
-   }
-   return pos;
-}
-
-function gen_solution (M, helper, n) {
-    var mov_x = [-2, -1, +1, +2, +2, +1, -1, -2];
-    var mov_y = [-1, -2, -2, -1, +1, +2, +2, +1];
-    var step = 1;
-    var x = 0; var y = 0;
-
-    M[x][y] = step;
-    while ( true ) {
-        if ( step == n * n) {
-            return true;
-        }
-        var soluciones = [];
-        for (var index = 0; index < mov_x.length; index++) {
-            var i = x + mov_x[index];
-            var j = y + mov_y[index];
-            if (check (i, j, n) && M [i][j] == 0) {
-               soluciones.push ( {x:i, y:j});
-            }
-        }
-        if (soluciones.length == 0) {
-           break;
-        }
-        var idx = use_helper (soluciones, helper) ;
-        x =  soluciones[ idx ].x;
-        y =  soluciones[ idx ].y;
-        step++;
-        M[x][y] = step;
-       //console.log ("step: " + step);
-
-    }
-    return false;
-}
-
-
-function initMatrix (n) {
-    var matrix = [];
-    for (var i = 0; i < n; i++) {
-        var fila = [];
-        for (var j = 0; j < n; j++) {
-            fila[j] = 0;
-        }
-        matrix[i] = fila;
-    }
-    return matrix;
-}
 var inicio = 1;
 generar.onclick = function () {
-    inicio = 1;
     tablero.innerHTML = '';
     var n = parseInt(document.getElementById('lados').value);
 
-    for( var i = 0; i < 1000; i++) {
-        var M = initMatrix (n);
-        var helper = gen_heuristic (n);
-        if (gen_solution (M, helper, n) ) {
-            break;
-        }
-    }
-
     var tabla = document.createElement('table');
-    tabla.border = "1";
+    tabla.cellspacing = "0";
     for (var i = 0; i < n; i++) {
         var fila = document.createElement('tr');
         for (var j = 0; j < n; j++) {
@@ -124,27 +16,20 @@ generar.onclick = function () {
             if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0) {
                 celda.setAttribute('class', 'negro');
             }
-            celda.setAttribute('id',M[i][j]);
-
             fila.appendChild(celda);
         }
         tabla.appendChild(fila);
     }
     tablero.appendChild(tabla);
+
 }
 
-var solucion=document.getElementById('siguiente');
-
+var solucion=document.getElementById('solucion');
 solucion.onclick=function() {
-  var n = parseInt(document.getElementById('lados').value);
+  boton.innerHTML='';
 
-  for( var i = 0; i < 1000; i++) {
-      var M = initMatrix (n);
-      var helper = gen_heuristic (n);
-      if (gen_solution (M, helper, n) ) {
-          break;
-      }
-  }
+  var n = parseInt(document.getElementById('lados').value);
+  var M = solution(n);
 
   var filas = document.getElementsByTagName('tr');
   for (var i = 0; i < n; i++) {
@@ -155,16 +40,53 @@ solucion.onclick=function() {
   }
 }
 
-var pasos = document.getElementById('paso');
 
-pasos.onclick=function () {
-  var celda = document.getElementsByTagName('td');
-  if(inicio>celda.length){
-    inicio=1;
+var s_paso = document.getElementById('paso');
+s_paso.onclick=function () {
+  ocultar();
+
+  var n = parseInt(document.getElementById('lados').value);
+  var M = solution(n);
+
+  var filas = document.getElementsByTagName('tr');
+  for (var i = 0; i < n; i++) {
+      var celdas = filas[i].childNodes;
+      for (var j = 0; j < n; j++) {
+          celdas[j].id = M[i][j];
+      }
   }
+
+  boton.innerHTML='';
+  var btn_siguiente= document.createElement('button');
+  btn_siguiente.setAttribute('id', 'siguiente');
+  btn_siguiente.setAttribute('onclick', 'pasos(this)');
+  btn_siguiente.appendChild(document.createTextNode('Empezar'));
+  boton.appendChild(btn_siguiente);
+
+  inicio=1;
+}
+
+function ocultar() {
+  var celda = document.getElementsByTagName('td');
   for(var j in celda){
-      if(celda[j].id==inicio){
-        celda[j].innerHTML=inicio;
+    celda[j].innerHTML='';
+  }
+}
+
+function pasos (e) {
+  var texto = document.createTextNode('Siguiente');
+  e.replaceChild(texto, e.firstChild);
+
+  var celdas = document.getElementsByTagName('td');
+  var imagen = document.createElement('img');
+  imagen.setAttribute('src','https://www-lucaschess.rhcloud.com/static/images/bn.png');
+  imagen.setAttribute('width','35');
+
+  var numero=document.createTextNode(inicio);
+  for(var j in celdas){
+      if(celdas[j].id==inicio){
+        celdas[j].appendChild(imagen);
+        celdas[j].appendChild(numero);
       }
   }
   inicio++;
